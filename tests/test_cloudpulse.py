@@ -13,7 +13,6 @@ from backend.models import TelemetryPoint, CloudIncident, ChaosInjectionRequest
 from backend.event_bus import EventBus
 from backend.anomaly_detector import AnomalyDetector
 from backend.self_healer import SelfHealingController
-from backend.main import app
 
 
 # ==========================================
@@ -198,6 +197,7 @@ def test_self_healer_circuit_breaker_tripping():
 
 @pytest.fixture
 def client():
+    from backend.main import app
     with TestClient(app) as c:
         yield c
 
