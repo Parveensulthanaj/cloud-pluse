@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudPulse | Autonomous Cloud Telemetry & Self-Healing SRE Platform</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navigation Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+            <polyline points="13 11 9 15 13 19"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">CloudPulse</div>
+          <div class="brand-subtitle">Autonomous SRE Telemetry & Self-Healing Mesh</div>
+        </div>
+      </div>
+
+      <div class="nav-status">
+        <div class="status-indicator live-pulse">
+          <span class="pulse-dot"></span>
+          <span id="sse-status">STREAM CONNECTED</span>
+        </div>
+        <div class="region-badge">
+          <span class="region-dot"></span>
+          <span>AWS us-east-1 (Multi-AZ)</span>
+        </div>
+        <a href="/metrics" target="_blank" class="nav-link-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          <span>Prometheus /metrics</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Global KPI Bar -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">TOTAL BUS EVENTS</div>
+        <div class="kpi-value" id="kpi-events-published">--</div>
+        <div class="kpi-footer text-cyan">Pub/Sub Ingestion Stream</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SYSTEM HEALTH</div>
+        <div class="kpi-value text-emerald" id="kpi-system-health">100%</div>
+        <div class="kpi-footer" id="kpi-health-sub">All microservices green</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ACTIVE INCIDENTS</div>
+        <div class="kpi-value text-amber" id="kpi-active-incidents">0</div>
+        <div class="kpi-footer" id="kpi-incidents-sub">0 Pending Anomaly</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">HEALING ACTIONS</div>
+        <div class="kpi-value text-violet" id="kpi-remediations">0</div>
+        <div class="kpi-footer">Autonomous Closed-Loop</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">DEAD LETTER QUEUE (DLQ)</div>
+        <div class="kpi-value" id="kpi-dlq-count">0</div>
+        <div class="kpi-footer text-muted">0 Corrupted Packets</div>
+      </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <!-- Left Column: Topology Mesh & Chaos Injection -->
+      <section class="left-pane">
+        <!-- Topology Mesh -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <span>Cloud Microservice Topology Mesh</span>
+            </div>
+            <span class="badge" id="topology-count">6 Nodes Monitored</span>
+          </div>
+          <div class="services-grid" id="services-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Chaos Engineering Controls -->
+        <div class="panel chaos-panel">
+          <div class="panel-header">
+            <div class="panel-title text-amber">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>Chaos Engineering & Fault Injection Console</span>
+            </div>
+            <span class="badge badge-warning">Live Resilience Testing</span>
+          </div>
+          <p class="panel-desc">
+            Simulate real-world cloud failures to witness real-time anomaly detection, alert correlation, and autonomous closed-loop self-healing in action.
+          </p>
+          <div class="chaos-actions">
+            <button class="btn btn-chaos" onclick="triggerChaos('database-cluster', 'DB_POOL_EXHAUSTION')">
+              <span class="btn-icon">💥</span>
+              <span>Exhaust DB Connection Pool</span>
+              <small class="btn-sub">Cascades to Order & Payment APIs</small>
+            </button>
+            <button class="btn btn-chaos" onclick="triggerChaos('payment-gateway', 'LATENCY_SPIKE')">
+              <span class="btn-icon">⏱️</span>
+              <span>Inject Latency Spike (Payment)</span>
+              <small class="btn-sub">Triggers Horizontal Pod Auto-scale (HPA)</small>
+            </button>
+            <button class="btn btn-chaos" onclick="triggerChaos('order-api', 'HTTP_500_STORM')">
+              <span class="btn-icon">⚡</span>
+              <span>Inject HTTP 500 Storm (Order)</span>
+              <small class="btn-sub">Trips Circuit Breaker & Sheds Traffic</small>
+            </button>
+            <button class="btn btn-chaos" onclick="triggerChaos('auth-service', 'MEMORY_LEAK')">
+              <span class="btn-icon">📈</span>
+              <span>Simulate Memory Leak (Auth)</span>
+              <small class="btn-sub">Triggers Graceful Container Restart</small>
+            </button>
+            <button class="btn btn-reset" onclick="clearChaos()">
+              <span class="btn-icon">🛡️</span>
+              <span>Clear All Active Chaos</span>
+            </button>
+          </div>
+          <div id="chaos-status-bar" class="chaos-status-banner hidden">
+            <span>⚡ Active Fault:</span> <strong id="chaos-active-name">--</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Incident Stream & Self-Healing Action Log -->
+      <section class="right-pane">
+        <!-- Incidents Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title text-rose">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Incident Radar & Root-Cause Analysis</span>
+            </div>
+            <span class="badge badge-danger" id="active-incident-count">0 Open</span>
+          </div>
+          <div class="incidents-list" id="incidents-container">
+            <div class="empty-state">
+              <div class="empty-icon">✓</div>
+              <div class="empty-title">All Systems Nominal</div>
+              <div class="empty-sub">Dynamic Z-score & EWMA baseline filters show no statistical anomalies.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Self-Healing Action Log -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title text-violet">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Autonomous Self-Healing Audit Trail</span>
+            </div>
+            <span class="badge badge-purple" id="remediation-count">Closed-Loop</span>
+          </div>
+          <div class="remediation-list" id="remediations-container">
+            <div class="empty-state">
+              <div class="empty-title">Autonomous Controller Standing By</div>
+              <div class="empty-sub">Policies configured: HPA Auto-Scaling, Circuit Breaker Tripping, Container Restarts.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
